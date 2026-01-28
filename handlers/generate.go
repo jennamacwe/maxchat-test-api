@@ -11,7 +11,6 @@ import (
 	"pdf-api/utils"
 )
 
-
 type GeneratePDFRequest struct {
 	Title           string `json:"title"`
 	InstitutionName string `json:"institution_name"`
