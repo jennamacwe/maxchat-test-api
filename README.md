@@ -92,10 +92,10 @@ Atur konfigurasi database di:
 config/database.go
 ```
 Sesuaikan:
--host
--username
--password
--database name
+- host
+- username
+- password
+- database name
 
 ---
 
@@ -147,11 +147,91 @@ Content-Type: multipart/form-data
   "message": "PDF uploaded successfully",
   "data": {
     "id": 1,
-    "filename": "file_1700000000.pdf",
-    "status": "UPLOADED"
+    "original_name": "document.pdf",
+    "filename": "upload_1700000000000.pdf",
+    "filepath": "uploads/pdf/upload_1700000000000.pdf",
+    "size": 102400,
+    "status": "UPLOADED",
+    "created_at": "2026-01-28T10:00:00Z"
   }
 }
 ```
+
+**Error Response**:
+1. File tidak dikirim
+
+```json
+{
+  "success": false,
+  "message": "File is required"
+}
+```
+Terjadi jika field file tidak ada di form-data.
+
+2. Ukuran file melebihi 10MB
+
+```json
+{
+  "success": false,
+  "message": "File size exceeds maximum limit (10MB)"
+}
+```
+Maksimal ukuran file adalah 10MB.
+
+3. File bukan PDF (ekstensi salah)
+
+```json
+{
+  "success": false,
+  "message": "Only PDF files are allowed"
+}
+```
+Ekstensi selain .pdf akan ditolak.
+
+4. MIME type tidak valid
+
+```json
+{
+  "success": false,
+  "message": "Invalid MIME type"
+}
+```
+
+Content-Type file harus application/pdf.
+
+5. Gagal menyimpan file ke server
+
+```json
+{
+  "success": false,
+  "message": "Failed to save file"
+}
+```
+
+Masalah permission atau folder tidak bisa dibuat.
+
+6. Gagal menulis file
+
+```json
+{
+  "success": false,
+  "message": "Failed to write file"
+}
+```
+
+Error saat proses penulisan file ke storage.
+
+7. Gagal menyimpan data ke database
+   
+```json
+{
+  "success": false,
+  "message": "Failed to save data"
+}
+```
+
+Error saat insert data ke tabel pdf_files.
+
 ---
 
 ### 2. Generate PDF
