@@ -51,8 +51,7 @@ pdf-api/
 
 ```bash
 git clone https://github.com/jennamacwe/maxchat-test-api.git
-
-cd pdf-api
+cd maxchat-test-api
 ```
 
 ### 2. Install Dependencies
@@ -69,13 +68,21 @@ Buat database MySQL:
 CREATE DATABASE pdf_api;
 
 USE pdf_api;
+```
 
+Create Table:
+```sql
 CREATE TABLE pdf_files (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  filename VARCHAR(255),
-  filepath TEXT,
-  status VARCHAR(50),
-  created_at DATETIME
+  id BIGINT NOT NULL AUTO_INCREMENT,
+  filename VARCHAR(255) NOT NULL,
+  original_name VARCHAR(255) DEFAULT NULL,
+  filepath VARCHAR(500) NOT NULL,
+  size BIGINT DEFAULT NULL,
+  status ENUM('CREATED','UPLOADED','DELETED') NOT NULL DEFAULT 'CREATED',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY (id)
 );
 ```
 
@@ -84,6 +91,11 @@ Atur konfigurasi database di:
 ```
 config/database.go
 ```
+Sesuaikan:
+-host
+-username
+-password
+-database name
 
 ---
 
@@ -98,7 +110,7 @@ Server berjalan di:
 http://localhost:8080
 ```
 
-Health Check:
+Status Check:
 ```
 GET /api/status
 ```
@@ -106,11 +118,21 @@ GET /api/status
 ---
 
 ## API Endpoints
+Base URL
+```
+http://localhost:8080/api
+```
 
 ### 1. Upload PDF
+**Endpoint**:
 
 ```
 POST /api/pdf/upload
+```
+
+**Headers**:
+```
+Content-Type: multipart/form-data
 ```
 
 **Body (form-data):**
@@ -118,9 +140,22 @@ POST /api/pdf/upload
 |------|------|----------|
 | file | File |    ✅    |
 
+**Success Response**:
+ ```json
+{
+  "success": true,
+  "message": "PDF uploaded successfully",
+  "data": {
+    "id": 1,
+    "filename": "file_1700000000.pdf",
+    "status": "UPLOADED"
+  }
+}
+```
 ---
 
 ### 2. Generate PDF
+**Endpoint**:
 
 ```
 POST /api/pdf/generate
@@ -143,21 +178,84 @@ Content-Type: application/json
 }
 ```
 
+**Success Response**:
+```json
+{
+  "success": true,
+  "message": "PDF generated successfully",
+  "data": {
+    "filename": "generated_1700000000.pdf"
+  }
+}
+```
 ---
 
 ### 3. List PDF
+**Endpoint**:
 
 ```
 GET /api/pdf/list
 ```
 
+**Success Response**:
+```json
+{
+  "success": true,
+  "message": "PDF list retrieved",
+  "data": [
+    {
+      "id": 1,
+      "filename": "file_1700000000.pdf",
+      "status": "UPLOADED",
+      "created_at": "2026-01-28 10:00:00"
+    }
+  ]
+}
+```
+
 ---
 
-### 4. Delete PDF
+### 4. Delete PDF (Soft Delete)
+**Endpoint**:
 
 ```
 DELETE /api/pdf/{id}
 ```
+
+**Success Response**:
+```json
+{
+  "success": true,
+  "message": "PDF deleted successfully",
+  "data": {
+    "id": 1,
+    "status": "DELETED",
+    "deleted_at": "2026-01-28 10:10:00"
+  }
+}
+```
+
+**Error Response**:
+```json
+{
+  "success": false,
+  "message": "File not found"
+}
+```
+---
+
+## Database Schema Documentation
+| Column Name     | Type      | Description                      |
+| --------------- | --------- | -------------------------------- |
+| `id`            | BIGINT    | Primary Key (Auto Increment)     |
+| `filename`      | VARCHAR   | Stored filename                  |
+| `original_name` | VARCHAR   | Original uploaded filename       |
+| `filepath`      | VARCHAR   | File path on server              |
+| `size`          | BIGINT    | File size (bytes)                |
+| `status`        | ENUM      | `CREATED`, `UPLOADED`, `DELETED` |
+| `created_at`    | TIMESTAMP | Created time                     |
+| `updated_at`    | TIMESTAMP | Last updated time                |
+| `deleted_at`    | TIMESTAMP | Soft delete timestamp            |
 
 ---
 
@@ -168,18 +266,27 @@ Semua endpoint diuji menggunakan **Postman**:
 - Multipart form-data
 - Error handling
 
+**Postman Collection tersedia di folder:**
+```json
+postman/pdf-api.postman_collection.json
+```
+
+Berisi:
+- Semua endpoint
+- Contoh request & response
+- Environment variable
+
 ---
 
 ## Features Implemented
 
 - REST API tanpa framework
-- Upload PDF
-- Generate PDF dari JSON
-- Header & Footer PDF
-- Simpan file ke local storage
-- Simpan metadata ke MySQL
-- Soft delete data
-- Error handling & validation
+- Upload & generate PDF
+- Metadata storage ke MySQL
+- Soft delete implementation
+- Validasi & error handling
+- Clean project structure
+- Postman documentation
 
 ---
 
@@ -190,18 +297,7 @@ Backend Developer Candidate
 
 ---
 
-## Notes
-
-Project ini dibuat sesuai dengan kebutuhan technical test dan dapat dikembangkan lebih lanjut dengan:
-- Authentication
-- Pagination
-- Cloud storage
-- Logging middleware
-
----
-
 Terima kasih atas kesempatan yang diberikan
 
 Best regards,
 Jennatul Macwe
-
