@@ -50,7 +50,8 @@ pdf-api/
 ### 1. Clone Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/jennamacwe/maxchat-test-api.git
+
 cd pdf-api
 ```
 
