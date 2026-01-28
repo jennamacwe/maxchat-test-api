@@ -92,10 +92,10 @@ Atur konfigurasi database di:
 config/database.go
 ```
 Sesuaikan:
--host
--username
--password
--database name
+- host
+- username
+- password
+- database name
 
 ---
 
