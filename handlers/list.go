@@ -34,7 +34,7 @@ func ListPDF(w http.ResponseWriter, r *http.Request) {
 
 	args := []interface{}{}
 
-	// Filter status (optional)
+	// Filter status
 	if status != "" {
 		query += " AND status = ?"
 		args = append(args, status)
