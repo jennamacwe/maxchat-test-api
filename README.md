@@ -133,11 +133,12 @@ Content-Type: application/json
 **Body (JSON):**
 ```json
 {
-  "title": "Laporan Kunjungan",
+  "title": "PDF Dengan Logo",
   "institution_name": "PT Maxchat Indonesia",
   "address": "Jakarta",
   "phone": "021-123456",
-  "content": "Isi laporan PDF"
+  "logo_url": "default",
+  "content": "Ini PDF sudah ada logo di header kiri."
 }
 ```
 
